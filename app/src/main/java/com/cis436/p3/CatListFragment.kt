@@ -134,6 +134,15 @@ class CatListFragment : Fragment() {
                         })
                     queue.add(stringRequest)
                 }
+                else {
+                    viewModel.setSelectedCatInfo(
+                        selectedCat.name,
+                        selectedCat.temperament,
+                        selectedCat.origin,
+                        selectedCat.referenceImageId,
+                        selectedCat.imageUrl
+                    )
+                }
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
