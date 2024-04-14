@@ -57,7 +57,7 @@ class CatListFragment : Fragment() {
 
     // method to get cat list through API
     private fun populateSpinner() {
-        var catUrl = "https://api.thecatapi.com/v1/breeds" + "?api_key=live_v8zJ5H8yOl1OrDLU9tQ7rFO2geLsiziEvotJwNp8v9bms1VmCKueFcg4xBDuUO0Z"
+        var catUrl = "https://api.thecatapi.com/v1/breeds" + "?api_key="
 
         val queue = Volley.newRequestQueue(requireContext())
 
@@ -109,7 +109,7 @@ class CatListFragment : Fragment() {
                 if (selectedCat.referenceImageId.isNotEmpty()) {
                     val catImageUrl =
                         "https://api.thecatapi.com/v1/images/${selectedCat.referenceImageId}" +
-                                "?api_key=live_v8zJ5H8yOl1OrDLU9tQ7rFO2geLsiziEvotJwNp8v9bms1VmCKueFcg4xBDuUO0Z"
+                                "?api_key="
 
                     val queue = Volley.newRequestQueue(requireContext())
 
