@@ -20,6 +20,7 @@ import org.json.JSONObject
 
 class CatListFragment : Fragment() {
 
+    // Define a cat class to store fetched data before saving to view model
     data class Cat(
         val name: String,
         val temperament: String,
@@ -31,8 +32,11 @@ class CatListFragment : Fragment() {
     private var _binding: FragmentCatListBinding? = null
     private val binding get() = _binding!!
 
+    // Use imported spinner and CatViewModel
     private lateinit var spinner: Spinner
     private lateinit var viewModel: CatViewModel
+
+    // Create an array of cat to store fetched cats' data
     private val cats: MutableList<Cat> = mutableListOf()
 
     override fun onCreateView(
@@ -40,14 +44,14 @@ class CatListFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentCatListBinding.inflate(inflater, container, false)
-        spinner = binding.catSpinner
+        spinner = binding.catSpinner // Bind the Spinner component to the defined spinner
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel = ViewModelProvider(this).get(CatViewModel::class.java)
-        populateSpinner()
+        viewModel = ViewModelProvider(this).get(CatViewModel::class.java) // Define viewModel based on the CatViewModel
+        populateSpinner() // Call the method to populate the spinner to a cat list fetched using API call
     }
 
     override fun onDestroyView() {
@@ -57,23 +61,27 @@ class CatListFragment : Fragment() {
 
     // method to get cat list through API
     private fun populateSpinner() {
-        var catUrl = "https://api.thecatapi.com/v1/breeds" + "?api_key="
+        // Define url to get cat data
+        var catUrl = "https://api.thecatapi.com/v1/breeds" + 
+        "?api_key=YOUR_API_KEY_HERE"
 
         val queue = Volley.newRequestQueue(requireContext())
 
+        // Make request through GET method of API call to get cat data
         val stringRequest = StringRequest(
             Request.Method.GET, catUrl,
             { response ->
-                val catsArray: JSONArray = JSONArray(response)
+                val catsArray: JSONArray = JSONArray(response) // Store the response as a JSON array
+                // For each cat, add the cat info to the defined cat array
                 for (i in 0 until catsArray.length()) {
                     val theCat: JSONObject = catsArray.getJSONObject(i)
-
                     val cat = Cat(
                         theCat.getString("name"),
                         theCat.getString("temperament"),
                         theCat.getString("origin"),
+                        // If the cat has no image, assign an empty string to the attribute
                         if (theCat.has("reference_image_id")) theCat.getString("reference_image_id") else "",
-                        ""
+                        "" // image url will be fetched later, so it is an empty string as placeholder for now
                     )
                     cats.add(cat)
                 }
@@ -106,16 +114,18 @@ class CatListFragment : Fragment() {
             ) {
                 val selectedCat = cats[position]
 
+                // If the selected cat has an image, make another API call to get the image
                 if (selectedCat.referenceImageId.isNotEmpty()) {
                     val catImageUrl =
                         "https://api.thecatapi.com/v1/images/${selectedCat.referenceImageId}" +
-                                "?api_key="
+                                "?api_key=YOUR_API_KEY_HERE"
 
                     val queue = Volley.newRequestQueue(requireContext())
 
                     val stringRequest = StringRequest(
                         Request.Method.GET, catImageUrl,
                         { response ->
+                            // Load the image url and save it to the cat array at the position of selected cat
                             val catImage: JSONObject = JSONObject(response)
                             val imageUrl = catImage.getString("url")
                             selectedCat.imageUrl = imageUrl
@@ -134,6 +144,7 @@ class CatListFragment : Fragment() {
                         })
                     queue.add(stringRequest)
                 }
+                // If the selected cat has no image, set the selected cat with empty image url string
                 else {
                     viewModel.setSelectedCatInfo(
                         selectedCat.name,
